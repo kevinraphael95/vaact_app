@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VAACT</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#c9a84c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VAACT">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dark: #8a6a1f;
+    --dark: #0a0806;
+    --dark2: #12100d;
+    --dark3: #1c1812;
+    --dark4: #252018;
+    --red: #8b1a1a;
+    --red-bright: #cc2222;
+    --blue: #1a3a6b;
+    --blue-bright: #2255bb;
+    --text: #e8d9b0;
+    --text-dim: #9a8a60;
+    --border: rgba(201,168,76,0.3);
+    --glow: rgba(201,168,76,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Background texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 20%, rgba(139,26,26,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(26,58,107,0.08) 0%, transparent 50%),
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(201,168,76,0.015) 40px, rgba(201,168,76,0.015) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(201,168,76,0.015) 40px, rgba(201,168,76,0.015) 41px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; flex-direction: column; min-height: 100vh; position: relative; z-index: 1; }
+  .page.active { display: flex; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(18,16,13,0.98) 0%, rgba(10,8,6,0.9) 100%);
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .header-top {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 3px;
+    text-shadow: none;
+    position: relative;
+  }
+
+  .logo-sub {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-top: -4px;
+  }
+
+  .header-icon {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--dark3);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+  .header-icon:active { transform: scale(0.9); background: var(--dark4); }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(0deg, rgba(12,10,8,0.99) 0%, rgba(18,16,13,0.97) 100%);
+    border-top: 1px solid var(--border);
+    display: flex;
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; padding: 6px 0;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .nav-item .nav-icon { font-size: 20px; transition: all 0.2s; filter: grayscale(1) opacity(0.5); }
+  .nav-item .nav-label {
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-dim); font-weight: 600; transition: all 0.2s;
+  }
+
+  .nav-item.active .nav-icon { filter: none; transform: scale(1.15); }
+  .nav-item.active .nav-label { color: var(--gold); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 30px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    border-radius: 0 0 2px 2px;
+  }
+
+  .nav-item:active { transform: scale(0.92); }
+
+  /* ── CONTENT ── */
+  .content { flex: 1; padding: 16px 16px 80px; overflow-y: auto; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: linear-gradient(135deg, var(--dark2) 0%, var(--dark3) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .card:active { transform: scale(0.98); border-color: rgba(201,168,76,0.5); }
+
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 4px;
+  }
+  .card-sub {
+    font-size: 12px; color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .badge-gold { background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: var(--gold); }
+  .badge-red { background: rgba(139,26,26,0.3); border: 1px solid rgba(204,34,34,0.4); color: #ff6b6b; }
+  .badge-blue { background: rgba(26,58,107,0.3); border: 1px solid rgba(34,85,187,0.4); color: #6ba3ff; }
+  .badge-green { background: rgba(20,80,40,0.3); border: 1px solid rgba(40,160,80,0.4); color: #6bff9a; }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 16px 0;
+  }
+
+  /* ══════════════════════════════
+     PAGE : ACCUEIL
+  ══════════════════════════════ */
+  .hero {
+    background: linear-gradient(135deg, rgba(139,26,26,0.2) 0%, rgba(26,58,107,0.2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '⚔';
+    position: absolute;
+    font-size: 120px;
+    opacity: 0.04;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 28px; font-weight: 900;
+    background: linear-gradient(135deg, var(--red-bright), var(--gold), var(--blue-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 4px;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .hero-sub {
+    font-size: 10px; letter-spacing: 4px;
+    color: var(--text-dim); text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .stats-row {
+    display: flex; gap: 8px;
+    margin-top: 8px;
+  }
+  .stat-box {
+    flex: 1;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: 'Cinzel', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 9px; letter-spacing: 1.5px;
+    color: var(--text-dim); text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .update-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .update-item:last-child { border-bottom: none; }
+
+  .update-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold);
+    margin-top: 6px; flex-shrink: 0;
+    box-shadow: 0 0 6px var(--gold);
+  }
+  .update-dot.red { background: var(--red-bright); box-shadow: 0 0 6px var(--red-bright); }
+  .update-dot.blue { background: var(--blue-bright); box-shadow: 0 0 6px var(--blue-bright); }
+
+  .update-text { font-size: 13px; line-height: 1.4; color: var(--text); }
+  .update-date { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ══════════════════════════════
+     PAGE : PROFIL
+  ══════════════════════════════ */
+  .avatar-container {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 0 16px;
+  }
+  .avatar {
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: linear-gradient(135deg, var(--dark3), var(--dark4));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px;
+    box-shadow: 0 0 20px rgba(201,168,76,0.2), inset 0 0 20px rgba(0,0,0,0.3);
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .avatar-rank {
+    position: absolute; bottom: -4px; right: -4px;
+    background: var(--dark);
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .profile-name {
+    font-family: 'Cinzel', serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 2px;
+  }
+  .profile-title {
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--text-dim); text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat-card-val {
+    font-family: 'Cinzel', serif;
+    font-size: 26px; font-weight: 700;
+    color: var(--gold);
+  }
+  .stat-card-label {
+    font-size: 10px; letter-spacing: 1.5px;
+    color: var(--text-dim); text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .progress-bar {
+    background: rgba(0,0,0,0.4);
+    border-radius: 4px; height: 6px;
+    margin-top: 8px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold-light));
+    transition: width 1s ease;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 10px; color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  /* ══════════════════════════════
+     PAGE : DECKS
+  ══════════════════════════════ */
+  .deck-card {
+    background: linear-gradient(135deg, var(--dark2), var(--dark3));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .deck-card:active { transform: scale(0.98); }
+
+  .deck-icon {
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .deck-icon.red-bg { background: linear-gradient(135deg, rgba(139,26,26,0.4), rgba(80,10,10,0.6)); }
+  .deck-icon.blue-bg { background: linear-gradient(135deg, rgba(26,58,107,0.4), rgba(10,30,80,0.6)); }
+  .deck-icon.dark-bg { background: linear-gradient(135deg, rgba(40,20,60,0.4), rgba(20,10,40,0.6)); }
+  .deck-icon.gold-bg { background: linear-gradient(135deg, rgba(100,70,10,0.4), rgba(60,40,5,0.6)); }
+
+  .deck-info { flex: 1; }
+  .deck-name {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 3px;
+  }
+  .deck-meta {
+    font-size: 11px; color: var(--text-dim);
+    display: flex; gap: 8px; align-items: center;
+  }
+  .deck-arrow {
+    color: var(--text-dim); font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .add-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed rgba(201,168,76,0.3);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--text-dim);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 13px; letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+    margin-top: 4px;
+  }
+  .add-btn:active { background: var(--dark3); border-color: var(--gold); color: var(--gold); }
+
+  /* ══════════════════════════════
+     PAGE : PUZZLES
+  ══════════════════════════════ */
+  .puzzle-header {
+    background: linear-gradient(135deg, rgba(26,58,107,0.3), rgba(10,30,80,0.2));
+    border: 1px solid rgba(34,85,187,0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .puzzle-trophy { font-size: 40px; }
+  .puzzle-score-val {
+    font-family: 'Cinzel', serif;
+    font-size: 30px; font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .puzzle-score-label {
+    font-size: 10px; letter-spacing: 2px;
+    color: var(--text-dim); text-transform: uppercase;
+  }
+
+  .puzzle-item {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 14px;
+    transition: all 0.2s;
+  }
+  .puzzle-item:active { transform: scale(0.98); }
+  .puzzle-item.locked { opacity: 0.5; }
+
+  .puzzle-num {
+    font-family: 'Cinzel', serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--text-dim);
+    width: 32px; text-align: center; flex-shrink: 0;
+  }
+  .puzzle-num.done { color: var(--gold); }
+
+  .puzzle-info { flex: 1; }
+  .puzzle-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .puzzle-desc { font-size: 11px; color: var(--text-dim); }
+
+  .puzzle-status { font-size: 18px; flex-shrink: 0; }
+
+  /* ══════════════════════════════
+     PAGE : PARAMÈTRES
+  ══════════════════════════════ */
+  .settings-section { margin-bottom: 20px; }
+
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+  }
+  .setting-row:last-child { border-bottom: none; }
+
+  .setting-label {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .setting-icon {
+    width: 34px; height: 34px;
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .setting-text { font-size: 14px; font-weight: 500; color: var(--text); }
+  .setting-sub { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+
+  /* Toggle */
+  .toggle {
+    width: 44px; height: 24px;
+    background: var(--dark4);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 3px;
+    width: 16px; height: 16px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    transition: all 0.3s;
+  }
+  .toggle.on { background: rgba(201,168,76,0.2); border-color: var(--gold); }
+  .toggle.on::after { left: calc(100% - 19px); background: var(--gold); box-shadow: 0 0 6px var(--gold); }
+
+  .setting-arrow { color: var(--text-dim); font-size: 16px; }
+
+  /* ══════════════════════════════
+     PAGE : UPDATES
+  ══════════════════════════════ */
+  .update-card {
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    position: relative; overflow: hidden;
+  }
+  .update-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .update-card.gold::before { background: var(--gold); }
+  .update-card.red::before { background: var(--red-bright); }
+  .update-card.blue::before { background: var(--blue-bright); }
+
+  .update-card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 6px;
+    padding-left: 8px;
+  }
+  .update-card-body {
+    font-size: 13px; color: var(--text);
+    line-height: 1.5;
+    padding-left: 8px;
+  }
+  .update-card-date {
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-top: 8px; padding-left: 8px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     PAGE : ACCUEIL
+══════════════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo">VAACT</div>
+        <div class="logo-sub">Very Accurate Anime Card Tournament</div>
+      </div>
+      <div class="header-icon">🔔</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="hero">
+      <div class="hero-title">SAISON 3</div>
+      <div class="hero-sub">Tournoi en cours</div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-val">12</div>
+          <div class="stat-label">Duelistes</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">4</div>
+          <div class="stat-label">Rondes</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">3</div>
+          <div class="stat-label">Restantes</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Prochain duel</div>
+    <div class="card" style="display:flex; align-items:center; gap:16px;">
+      <div style="text-align:center; flex:1;">
+        <div style="font-size:28px; margin-bottom:4px;">🎴</div>
+        <div style="font-family:'Cinzel',serif; font-size:13px; color:var(--gold-light);">KevinR</div>
+        <div class="badge badge-gold" style="margin-top:4px;">2-1</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Cinzel Decorative',serif; font-size:18px; color:var(--text-dim);">VS</div>
+      </div>
+      <div style="text-align:center; flex:1;">
+        <div style="font-size:28px; margin-bottom:4px;">⚔️</div>
+        <div style="font-family:'Cinzel',serif; font-size:13px; color:var(--gold-light);">DarkMage</div>
+        <div class="badge badge-blue" style="margin-top:4px;">1-2</div>
+      </div>
+    </div>
+
+    <div class="section-title">Classement top 3</div>
+    <div class="card" style="padding:12px 16px;">
+      <div style="display:flex; flex-direction:column; gap:0;">
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(201,168,76,0.1);">
+          <div style="font-size:20px;">🥇</div>
+          <div style="flex:1; font-family:'Cinzel',serif; font-size:14px; color:var(--gold-light);">Pharaoh_X</div>
+          <div class="badge badge-gold">3-0</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(201,168,76,0.1);">
+          <div style="font-size:20px;">🥈</div>
+          <div style="flex:1; font-family:'Cinzel',serif; font-size:14px; color:var(--text);">KevinR</div>
+          <div class="badge badge-blue">2-1</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:10px 0;">
+          <div style="font-size:20px;">🥉</div>
+          <div style="flex:1; font-family:'Cinzel',serif; font-size:14px; color:var(--text);">ShadowRealm</div>
+          <div class="badge badge-blue">2-1</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Dernières news</div>
+    <div class="card">
+      <div class="update-item">
+        <div class="update-dot"></div>
+        <div>
+          <div class="update-text">Ronde 4 commence ce weekend !</div>
+          <div class="update-date">Aujourd'hui</div>
+        </div>
+      </div>
+      <div class="update-item">
+        <div class="update-dot blue"></div>
+        <div>
+          <div class="update-text">Nouvelle règle : les cartes Harpie sont maintenant autorisées</div>
+          <div class="update-date">Il y a 2 jours</div>
+        </div>
+      </div>
+      <div class="update-item">
+        <div class="update-dot red"></div>
+        <div>
+          <div class="update-text">DarkMage vs ShadowRealm : victoire 2-0 de DarkMage</div>
+          <div class="update-date">Il y a 3 jours</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE : UPDATES
+══════════════════════════════ -->
+<div class="page" id="page-updates">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo" style="font-size:18px;">Updates</div>
+        <div class="logo-sub">Annonces & patchs</div>
+      </div>
+      <div class="header-icon">🔍</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Cette semaine</div>
+
+    <div class="update-card gold">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="update-card-title">🏆 Ronde 4 lancée</div>
+        <span class="badge badge-gold">Tournoi</span>
+      </div>
+      <div class="update-card-body">La ronde 4 du VAACT Saison 3 commence ce weekend. Tous les matchs doivent être joués avant dimanche 23h59.</div>
+      <div class="update-card-date">20 Fév 2026</div>
+    </div>
+
+    <div class="update-card blue">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="update-card-title">📜 Mise à jour de la banlist</div>
+        <span class="badge badge-blue">Règles</span>
+      </div>
+      <div class="update-card-body">Les cartes Harpie Lady Sisters, Dragon Blanc aux Yeux Bleus alternative, et Magicien du Chaos sont désormais autorisées à 1 exemplaire.</div>
+      <div class="update-card-date">18 Fév 2026</div>
+    </div>
+
+    <div class="section-title">Semaine dernière</div>
+
+    <div class="update-card red">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="update-card-title">⚔️ Résultats ronde 3</div>
+        <span class="badge badge-red">Résultats</span>
+      </div>
+      <div class="update-card-body">Pharaoh_X reste invaincu avec une victoire 2-0 contre Millenium_Eye. KevinR bat ShadowRealm en 3 parties acharnées.</div>
+      <div class="update-card-date">15 Fév 2026</div>
+    </div>
+
+    <div class="update-card gold">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div class="update-card-title">🎴 Nouveau puzzle ajouté</div>
+        <span class="badge badge-gold">Puzzles</span>
+      </div>
+      <div class="update-card-body">Un nouveau puzzle "Le Sacrifice du Pharaon" a été ajouté à la section Puzzles. Niveau : Expert.</div>
+      <div class="update-card-date">13 Fév 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE : PROFIL
+══════════════════════════════ -->
+<div class="page" id="page-profile">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo" style="font-size:18px;">Profil</div>
+        <div class="logo-sub">Statistiques & rang</div>
+      </div>
+      <div class="header-icon">✏️</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="avatar-container">
+      <div class="avatar">
+        🧙
+        <div class="avatar-rank">👑</div>
+      </div>
+      <div class="profile-name">KevinR</div>
+      <div class="profile-title">Maître Dueliste · Saison 3</div>
+      <div style="margin-top:8px; display:flex; gap:6px;">
+        <span class="badge badge-gold">Top 2</span>
+        <span class="badge badge-blue">Tournoi actif</span>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-card-val" style="color:#6bff9a;">12</div>
+        <div class="stat-card-label">Victoires</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val" style="color:#ff6b6b;">5</div>
+        <div class="stat-card-label">Défaites</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val">70%</div>
+        <div class="stat-card-label">Win Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-val" style="color:#6ba3ff;">3</div>
+        <div class="stat-card-label">Tournois</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Progression</div>
+      <div style="margin-top:12px;">
+        <div class="progress-label">
+          <span>XP Dueliste</span>
+          <span style="color:var(--gold);">2450 / 3000</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:82%;"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="progress-label">
+          <span>Puzzles résolus</span>
+          <span style="color:var(--gold);">7 / 12</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:58%; background: linear-gradient(90deg, #1a3a6b, #2255bb);"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Palmarès</div>
+    <div class="card" style="padding:12px 16px;">
+      <div style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(201,168,76,0.1);">
+        <div style="font-size:22px;">🏆</div>
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text);">Finaliste VAACT Saison 2</div>
+          <div style="font-size:11px; color:var(--text-dim);">Janvier 2026</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px; padding:8px 0;">
+        <div style="font-size:22px;">⭐</div>
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--text);">Meilleur deck Saison 1</div>
+          <div style="font-size:11px; color:var(--text-dim);">Octobre 2025</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE : DECKS
+══════════════════════════════ -->
+<div class="page" id="page-decks">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo" style="font-size:18px;">Decks</div>
+        <div class="logo-sub">Mes decks custom</div>
+      </div>
+      <div class="header-icon">➕</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Deck actif</div>
+
+    <div class="deck-card" style="background: linear-gradient(135deg, rgba(139,26,26,0.3), rgba(20,10,10,0.8)); border-color: rgba(204,34,34,0.4);">
+      <div class="deck-icon red-bg">🐉</div>
+      <div class="deck-info">
+        <div class="deck-name">Dragon Chaos BEWD</div>
+        <div class="deck-meta">
+          <span>40 cartes</span>
+          <span>·</span>
+          <span class="badge badge-red" style="font-size:9px;">Actif</span>
+        </div>
+      </div>
+      <div class="deck-arrow">›</div>
+    </div>
+
+    <div class="section-title">Mes decks</div>
+
+    <div class="deck-card">
+      <div class="deck-icon blue-bg">🌊</div>
+      <div class="deck-info">
+        <div class="deck-name">Exodia Stall</div>
+        <div class="deck-meta">
+          <span>43 cartes</span>
+          <span>·</span>
+          <span>Modifié il y a 3j</span>
+        </div>
+      </div>
+      <div class="deck-arrow">›</div>
+    </div>
+
+    <div class="deck-card">
+      <div class="deck-icon dark-bg">💜</div>
+      <div class="deck-info">
+        <div class="deck-name">Magicien du Chaos</div>
+        <div class="deck-meta">
+          <span>41 cartes</span>
+          <span>·</span>
+          <span>Modifié il y a 1sem</span>
+        </div>
+      </div>
+      <div class="deck-arrow">›</div>
+    </div>
+
+    <div class="deck-card">
+      <div class="deck-icon gold-bg">⚡</div>
+      <div class="deck-info">
+        <div class="deck-name">Harpie Aggro</div>
+        <div class="deck-meta">
+          <span>40 cartes</span>
+          <span>·</span>
+          <span>Nouveau</span>
+        </div>
+      </div>
+      <div class="deck-arrow">›</div>
+    </div>
+
+    <button class="add-btn">
+      <span>＋</span>
+      <span>Nouveau deck</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE : PUZZLES
+══════════════════════════════ -->
+<div class="page" id="page-puzzles">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo" style="font-size:18px;">Puzzles</div>
+        <div class="logo-sub">Défis Yu-Gi-Oh</div>
+      </div>
+      <div class="header-icon">🏅</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="puzzle-header">
+      <div class="puzzle-trophy">🏆</div>
+      <div>
+        <div class="puzzle-score-val">7 / 12</div>
+        <div class="puzzle-score-label">Puzzles résolus</div>
+        <div style="margin-top:6px;">
+          <span class="badge badge-gold">Rang : Expert</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Débutant</div>
+
+    <div class="puzzle-item">
+      <div class="puzzle-num done">01</div>
+      <div class="puzzle-icon" style="font-size:22px; margin-right:4px;">🐉</div>
+      <div class="puzzle-info">
+        <div class="puzzle-name">L'attaque du Dragon Blanc</div>
+        <div class="puzzle-desc">Gagne en 1 tour · Facile</div>
+      </div>
+      <div class="puzzle-status">✅</div>
+    </div>
+
+    <div class="puzzle-item">
+      <div class="puzzle-num done">02</div>
+      <div class="puzzle-icon" style="font-size:22px; margin-right:4px;">🃏</div>
+      <div class="puzzle-info">
+        <div class="puzzle-name">Le piège du Miroir</div>
+        <div class="puzzle-desc">Survie 3 tours · Facile</div>
+      </div>
+      <div class="puzzle-status">✅</div>
+    </div>
+
+    <div class="section-title">Intermédiaire</div>
+
+    <div class="puzzle-item">
+      <div class="puzzle-num done">03</div>
+      <div class="puzzle-icon" style="font-size:22px; margin-right:4px;">⚡</div>
+      <div class="puzzle-info">
+        <div class="puzzle-name">Combo Exodia</div>
+        <div class="puzzle-desc">Assemble les 5 pièces · Moyen</div>
+      </div>
+      <div class="puzzle-status">✅</div>
+    </div>
+
+    <div class="puzzle-item">
+      <div class="puzzle-num">04</div>
+      <div class="puzzle-icon" style="font-size:22px; margin-right:4px;">🌊</div>
+      <div class="puzzle-info">
+        <div class="puzzle-name">La muraille aquatique</div>
+        <div class="puzzle-desc">Zéro dégât reçu · Moyen</div>
+      </div>
+      <div class="puzzle-status">▶️</div>
+    </div>
+
+    <div class="section-title">Expert</div>
+
+    <div class="puzzle-item locked">
+      <div class="puzzle-num">05</div>
+      <div class="puzzle-icon" style="font-size:22px; margin-right:4px;">👑</div>
+      <div class="puzzle-info">
+        <div class="puzzle-name">Le Sacrifice du Pharaon</div>
+        <div class="puzzle-desc">Nouveau · Expert</div>
+      </div>
+      <div class="puzzle-status">🔒</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     PAGE : PARAMÈTRES
+══════════════════════════════ -->
+<div class="page" id="page-settings">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo" style="font-size:18px;">Paramètres</div>
+        <div class="logo-sub">Préférences</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Compte</div>
+    <div class="card" style="padding:4px 16px;">
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-icon">👤</div>
+          <div>
+            <div class="setting-text">Profil</div>
+            <div class="setting-sub">KevinR</div>
+          </div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-icon">🔗</div>
+          <div>
+            <div class="setting-text">Lier Discord</div>
+            <div class="setting-sub">Synchroniser avec le bot</div>
+          </div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="section-title">Application</div>
+    <div class="card" style="padding:4px 16px;">
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-icon">🔔</div>
+          <div>
+            <div class="setting-text">Notifications</div>
+            <div class="setting-sub">Matchs & annonces</div>
+          </div>
+        </div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-icon">🌙</div>
+          <div>
+            <div class="setting-text">Mode sombre</div>
+            <div class="setting-sub">Toujours actif</div>
+          </div>
+        </div>
+        <div class="toggle on"></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-icon">📶</div>
+          <div>
+            <div class="setting-text">Sync hors ligne</div>
+            <div class="setting-sub">Synchroniser quand connecté</div>
+          </div>
+        </div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Données</div>
+    <div class="card" style="padding:4px 16px;">
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-icon">☁️</div>
+          <div>
+            <div class="setting-text">Dernière synchro</div>
+            <div class="setting-sub">Aujourd'hui à 14:32</div>
+          </div>
+        </div>
+        <div style="font-size:12px; color:var(--gold); font-weight:600;">Sync</div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">
+          <div class="setting-icon">🗑️</div>
+          <div>
+            <div class="setting-text" style="color:#ff6b6b;">Vider le cache</div>
+            <div class="setting-sub">Libère de l'espace</div>
+          </div>
+        </div>
+        <div class="setting-arrow">›</div>
+      </div>
+    </div>
+
+    <div style="text-align:center; padding:20px 0; color:var(--text-dim); font-size:11px; letter-spacing:2px;">
+      VAACT APP v1.0.0 — BY KEVINR
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     BOTTOM NAV
+══════════════════════════════ -->
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="navigate('home', this)">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">Accueil</span>
+  </div>
+  <div class="nav-item" onclick="navigate('updates', this)">
+    <span class="nav-icon">📢</span>
+    <span class="nav-label">Updates</span>
+  </div>
+  <div class="nav-item" onclick="navigate('profile', this)">
+    <span class="nav-icon">👤</span>
+    <span class="nav-label">Profil</span>
+  </div>
+  <div class="nav-item" onclick="navigate('decks', this)">
+    <span class="nav-icon">🃏</span>
+    <span class="nav-label">Decks</span>
+  </div>
+  <div class="nav-item" onclick="navigate('puzzles', this)">
+    <span class="nav-icon">🧩</span>
+    <span class="nav-label">Puzzles</span>
+  </div>
+  <div class="nav-item" onclick="navigate('settings', this)">
+    <span class="nav-icon">⚙️</span>
+    <span class="nav-label">Paramètres</span>
+  </div>
+</nav>
+
+<script>
+  function navigate(page, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    el.classList.add('active');
+  }
+
+  // ── Service Worker (hors ligne) ──
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('[VAACT] SW enregistré ✅'))
+        .catch(err => console.log('[VAACT] SW erreur :', err));
+    });
+  }
+</script>
+</body>
+</html>
