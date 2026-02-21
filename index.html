@@ -10,322 +10,21 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VAACT">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --red:        #8b0000;
-  --red2:       #b00000;
-  --red3:       #cc1111;
-  --gold:       #c9a84c;
-  --gold-light: #f0d080;
-  --gold-dark:  #7a5c1a;
-  --dark:       #0d0d0d;
-  --dark2:      #161616;
-  --dark3:      #1f1f1f;
-  --dark4:      #2a2a2a;
-  --text:       #e8e0d0;
-  --text-dim:   #888070;
-  --border:     rgba(139,0,0,0.4);
-  --border-g:   rgba(201,168,76,0.25);
-}
 
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
-body {
-  background: var(--dark);
-  color: var(--text);
-  font-family: 'Rajdhani', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(139,0,0,0.12) 0%, transparent 60%),
-    repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(139,0,0,0.03) 60px, rgba(139,0,0,0.03) 61px),
-    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(139,0,0,0.03) 60px, rgba(139,0,0,0.03) 61px);
-  pointer-events:none; z-index:0;
-}
-
-/* ── PAGES ── */
-.page { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
-.page.active { display:flex; animation: fadeIn .25s ease; }
-@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-
-/* ── HEADER ── */
-.header {
-  padding: 14px 16px 12px;
-  border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(13,13,13,0.98), rgba(13,13,13,0.92));
-  position:sticky; top:0; z-index:100;
-  backdrop-filter: blur(10px);
-  display:flex; align-items:center; justify-content:space-between;
-}
-
-.logo-wrap { display:flex; align-items:center; gap:10px; }
-.logo-img { height:108px; width:auto; }
-.logo-text {
-  font-family:'Cinzel Decorative', serif;
-  font-size:20px; font-weight:900;
-  background: linear-gradient(135deg, var(--red2), var(--gold-light), var(--red2));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-  letter-spacing:3px;
-}
-.logo-sub {
-  font-size:8px; letter-spacing:3px; color:var(--text-dim);
-  text-transform:uppercase; margin-top:-3px;
-}
-
-/* ── BOTTOM NAV ── */
-.bottom-nav {
-  position:fixed; bottom:0; left:0; right:0;
-  background: linear-gradient(0deg, rgba(10,10,10,0.99), rgba(18,18,18,0.97));
-  border-top: 1px solid var(--border);
-  display:flex;
-  padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
-  z-index:100; backdrop-filter:blur(12px);
-}
-.nav-item {
-  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-  cursor:pointer; padding:6px 0; transition:all .2s; position:relative;
-}
-.nav-item .ni { font-size:19px; transition:all .2s; filter:grayscale(1) opacity(.45); }
-.nav-item .nl { font-size:8px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-dim); font-weight:600; transition:all .2s; }
-.nav-item.active .ni { filter:none; transform:scale(1.1); }
-.nav-item.active .nl { color:var(--red3); }
-.nav-item.active::before {
-  content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
-  width:28px; height:2px;
-  background: linear-gradient(90deg, transparent, var(--red3), transparent);
-}
-.nav-item:active { transform:scale(0.9); }
-
-/* ── CONTENT ── */
-.content { flex:1; padding:14px 14px 80px; overflow-y:auto; }
-
-/* ── SECTION TITLE ── */
-.stitle {
-  font-family:'Cinzel', serif; font-size:10px; letter-spacing:3px;
-  color:var(--red3); text-transform:uppercase; margin-bottom:10px;
-  display:flex; align-items:center; gap:8px;
-}
-.stitle::before { content:''; width:16px; height:1px; background:var(--red3); flex-shrink:0; }
-.stitle::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, var(--border), transparent); }
-
-/* ── CARD ── */
-.card {
-  background: linear-gradient(135deg, var(--dark2), var(--dark3));
-  border: 1px solid var(--border);
-  border-radius:10px; padding:14px; margin-bottom:10px;
-  position:relative; overflow:hidden; transition:all .2s;
-}
-.card::before {
-  content:''; position:absolute; inset:0;
-  background: linear-gradient(135deg, rgba(139,0,0,0.06), transparent 50%);
-  pointer-events:none;
-}
-.card:active { transform:scale(0.985); border-color:rgba(139,0,0,0.7); }
-.card-title { font-family:'Cinzel', serif; font-size:13px; font-weight:700; color:var(--gold-light); margin-bottom:4px; }
-.card-body { font-size:13px; color:var(--text); line-height:1.6; }
-.card-sub { font-size:11px; color:var(--text-dim); }
-
-/* ── BADGE ── */
-.badge {
-  display:inline-flex; align-items:center; padding:2px 8px;
-  border-radius:20px; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
-}
-.b-red   { background:rgba(139,0,0,0.25); border:1px solid rgba(204,17,17,0.5); color:#ff6060; }
-.b-gold  { background:rgba(201,168,76,0.12); border:1px solid rgba(201,168,76,0.4); color:var(--gold); }
-.b-blue  { background:rgba(20,50,120,0.25); border:1px solid rgba(40,100,200,0.4); color:#7ab0ff; }
-.b-green { background:rgba(10,80,30,0.25); border:1px solid rgba(30,150,60,0.4); color:#70ff98; }
-.b-grey  { background:rgba(60,60,60,0.3); border:1px solid rgba(100,100,100,0.3); color:#aaa; }
-
-/* ── DIVIDER ── */
-.divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:14px 0; }
-
-/* ══════════ ACCUEIL ══════════ */
-.hero {
-  background: linear-gradient(135deg, rgba(100,0,0,0.35) 0%, rgba(20,20,20,0.9) 60%);
-  border: 1px solid var(--border);
-  border-radius:12px; padding:22px 18px; margin-bottom:16px;
-  position:relative; overflow:hidden; text-align:center;
-}
-.hero::after {
-  content:'⚔'; position:absolute; font-size:140px; opacity:.04;
-  top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none;
-}
-.hero-title {
-  font-family:'Cinzel Decorative', serif; font-size:26px; font-weight:900;
-  background: linear-gradient(135deg, var(--red3), var(--gold-light), var(--red2));
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-  letter-spacing:4px; line-height:1.1; margin-bottom:4px;
-}
-.hero-sub { font-size:9px; letter-spacing:4px; color:var(--text-dim); text-transform:uppercase; margin-bottom:12px; }
-
-/* ══════════ PROFIL ══════════ */
-.avatar-wrap { display:flex; flex-direction:column; align-items:center; padding:20px 0 14px; }
-.avatar {
-  width:80px; height:80px; border-radius:50%;
-  border:2px solid var(--red2);
-  background:linear-gradient(135deg, var(--dark3), var(--dark4));
-  display:flex; align-items:center; justify-content:center; font-size:36px;
-  box-shadow:0 0 16px rgba(139,0,0,0.3); margin-bottom:10px;
-}
-.pname { font-family:'Cinzel', serif; font-size:18px; font-weight:700; color:var(--gold-light); letter-spacing:2px; }
-.ptitle { font-size:10px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-top:3px; }
-
-.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
-.sbox { background:var(--dark2); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center; }
-.sbox-val { font-family:'Cinzel', serif; font-size:24px; font-weight:700; color:var(--red3); }
-.sbox-lbl { font-size:9px; letter-spacing:1.5px; color:var(--text-dim); text-transform:uppercase; margin-top:2px; }
-
-.prog-wrap { margin-top:8px; }
-.prog-lbl { display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim); margin-bottom:3px; }
-.prog-bar { background:rgba(0,0,0,0.5); border-radius:3px; height:5px; overflow:hidden; border:1px solid var(--border); }
-.prog-fill { height:100%; border-radius:3px; background:linear-gradient(90deg, var(--red), var(--red3)); transition:width 1s ease; }
-
-/* ── PROFIL FORM ── */
-.form-input {
-  width:100%; background:var(--dark3); border:1px solid var(--border);
-  border-radius:8px; padding:10px 12px; color:var(--text);
-  font-family:'Rajdhani', sans-serif; font-size:14px;
-  outline:none; transition:all .2s; margin-bottom:10px;
-}
-.form-input:focus { border-color:var(--red2); }
-.form-input::placeholder { color:var(--text-dim); }
-
-.btn-primary {
-  width:100%; background:linear-gradient(135deg, var(--red), var(--red2));
-  border:1px solid var(--red3); border-radius:8px; padding:11px;
-  color:var(--text); font-family:'Cinzel', serif; font-size:12px;
-  font-weight:700; letter-spacing:2px; cursor:pointer; transition:all .2s;
-}
-.btn-primary:active { transform:scale(0.97); opacity:.9; }
-
-.btn-ghost {
-  background:transparent; border:1px solid var(--border); border-radius:8px; padding:9px 14px;
-  color:var(--text-dim); font-family:'Rajdhani', sans-serif; font-size:12px;
-  letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all .2s;
-}
-.btn-ghost:active { border-color:var(--red2); color:var(--red3); }
-
-/* ══════════ DECKS ══════════ */
-.deck-row {
-  background:linear-gradient(135deg, var(--dark2), var(--dark3));
-  border:1px solid var(--border); border-radius:10px; padding:14px;
-  margin-bottom:8px; display:flex; align-items:center; gap:12px; transition:all .2s;
-}
-.deck-row:active { transform:scale(0.98); }
-.deck-ico {
-  width:48px; height:48px; border-radius:8px; border:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;
-}
-.deck-ico.r { background:linear-gradient(135deg, rgba(100,0,0,.4), rgba(50,0,0,.6)); }
-.deck-ico.b { background:linear-gradient(135deg, rgba(0,30,100,.4), rgba(0,15,60,.6)); }
-.deck-ico.p { background:linear-gradient(135deg, rgba(50,0,80,.4), rgba(25,0,50,.6)); }
-.deck-ico.g { background:linear-gradient(135deg, rgba(80,50,0,.4), rgba(50,30,0,.6)); }
-
-.deck-name { font-family:'Cinzel', serif; font-size:13px; font-weight:700; color:var(--gold-light); margin-bottom:3px; }
-.deck-meta { font-size:11px; color:var(--text-dim); display:flex; gap:6px; align-items:center; }
-.deck-arrow { color:var(--text-dim); font-size:18px; flex-shrink:0; margin-left:auto; }
-
-.add-btn {
-  width:100%; background:transparent; border:1px dashed rgba(139,0,0,0.35);
-  border-radius:10px; padding:14px; color:var(--text-dim);
-  font-family:'Rajdhani', sans-serif; font-size:12px; letter-spacing:2px; text-transform:uppercase;
-  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .2s;
-}
-.add-btn:active { background:var(--dark3); border-color:var(--red2); color:var(--red3); }
-
-/* ══════════ PUZZLES ══════════ */
-.empty-state {
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  padding:60px 20px; text-align:center; gap:14px;
-}
-.empty-icon { font-size:64px; opacity:.3; }
-.empty-title { font-family:'Cinzel', serif; font-size:16px; color:var(--text-dim); }
-.empty-sub { font-size:12px; color:var(--text-dim); opacity:.7; line-height:1.5; max-width:240px; }
-
-/* ══════════ UPDATES ══════════ */
-.ucard {
-  background:var(--dark2); border:1px solid var(--border); border-radius:10px;
-  padding:14px; margin-bottom:8px; position:relative; overflow:hidden;
-}
-.ucard::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
-.ucard.r::before { background:var(--red3); }
-.ucard.g::before { background:var(--gold); }
-.ucard.b::before { background:#4a90e2; }
-.ucard-title { font-family:'Cinzel', serif; font-size:13px; font-weight:700; color:var(--gold-light); margin-bottom:5px; padding-left:8px; }
-.ucard-body { font-size:12px; color:var(--text); line-height:1.5; padding-left:8px; }
-.ucard-date { font-size:10px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; margin-top:7px; padding-left:8px; }
-
-/* ══════════ PARAMÈTRES ══════════ */
-.set-row {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:13px 0; border-bottom:1px solid rgba(139,0,0,0.1);
-}
-.set-row:last-child { border-bottom:none; }
-.set-lbl { display:flex; align-items:center; gap:10px; }
-.set-ico {
-  width:32px; height:32px; background:var(--dark3); border:1px solid var(--border);
-  border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:15px;
-}
-.set-text { font-size:13px; font-weight:500; color:var(--text); }
-.set-sub { font-size:10px; color:var(--text-dim); margin-top:1px; }
-.toggle {
-  width:42px; height:22px; background:var(--dark4); border:1px solid var(--border);
-  border-radius:11px; cursor:pointer; position:relative; transition:all .3s; flex-shrink:0;
-}
-.toggle::after {
-  content:''; position:absolute; left:3px; top:3px; width:14px; height:14px;
-  background:var(--text-dim); border-radius:50%; transition:all .3s;
-}
-.toggle.on { background:rgba(139,0,0,0.3); border-color:var(--red2); }
-.toggle.on::after { left:calc(100% - 17px); background:var(--red3); box-shadow:0 0 6px var(--red3); }
-.set-arrow { color:var(--text-dim); font-size:16px; }
-
-
-/* ══════════ DECK VIEWER ══════════ */
-.card-thumb {
-  aspect-ratio: 421/614;
-  border-radius: 4px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--dark3);
-  cursor: pointer;
-  transition: transform .15s;
-  position: relative;
-}
-.card-thumb:active { transform: scale(0.95); }
-.card-thumb img {
-  width: 100%; height: 100%;
-  object-fit: cover; display: block;
-}
-.card-thumb .card-qty {
-  position: absolute; bottom: 2px; right: 3px;
-  background: rgba(0,0,0,0.8); color: var(--gold);
-  font-size: 10px; font-weight: 700;
-  padding: 1px 4px; border-radius: 3px;
-  font-family: 'Cinzel', serif;
-}
-.card-thumb .card-fallback {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; color: var(--text-dim); text-align: center;
-  padding: 4px; line-height: 1.3;
-}
-.dv-empty { color: var(--text-dim); font-size:12px; padding: 8px 0; }
-
-/* ── SCROLL ── */
-::-webkit-scrollbar { width:3px; }
-::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
-</style>
+<!-- ── CSS modulaire ── -->
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/pages.css">
+<!--
+  Pour ajouter des styles spécifiques à une nouvelle page :
+  créer css/mapagecustom.css et l'inclure ici
+-->
 </head>
 <body>
 
 <!-- ══════════════════════════════
-     ACCUEIL
+     PAGE : ACCUEIL
 ══════════════════════════════ -->
 <div class="page active" id="page-home">
   <div class="header">
@@ -422,8 +121,9 @@ body::before {
   </div>
 </div>
 
+
 <!-- ══════════════════════════════
-     UPDATES
+     PAGE : UPDATES
 ══════════════════════════════ -->
 <div class="page" id="page-updates">
   <div class="header">
@@ -433,21 +133,14 @@ body::before {
     </div>
   </div>
   <div class="content">
-    <div class="stitle">Février 2026</div>
-
-    <div class="ucard g">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div class="ucard-title">🚀 Test VAACT App</div>
-        <span class="badge b-gold">Nouveau</span>
-      </div>
-      <div class="ucard-body">Test ! Vaact App.</div>
-      <div class="ucard-date">Fév 2026</div>
-    </div>
+    <!-- Rendu dynamique via updates.js — modifier les annonces dans js/updates.js -->
+    <div id="updates-container"></div>
   </div>
 </div>
 
+
 <!-- ══════════════════════════════
-     PROFIL
+     PAGE : PROFIL
 ══════════════════════════════ -->
 <div class="page" id="page-profile">
   <div class="header">
@@ -472,7 +165,7 @@ body::before {
 
       <div class="stat-grid">
         <div class="sbox">
-          <div class="sbox-val b-green" id="stat-wins" style="color:#70ff98;">0</div>
+          <div class="sbox-val" id="stat-wins" style="color:#70ff98;">0</div>
           <div class="sbox-lbl">Victoires</div>
         </div>
         <div class="sbox">
@@ -495,14 +188,19 @@ body::before {
       </div>
     </div>
 
-    <!-- FORMULAIRE EDITION -->
+    <!-- FORMULAIRE ÉDITION -->
     <div id="profile-edit" style="display:none;">
       <div class="stitle">Modifier le profil</div>
-      <input class="form-input" id="edit-name" placeholder="Pseudo" maxlength="20">
-      <input class="form-input" id="edit-deck" placeholder="Deck favori">
-      <input class="form-input" id="edit-wins" placeholder="Victoires" type="number" min="0">
-      <input class="form-input" id="edit-losses" placeholder="Défaites" type="number" min="0">
-      <input class="form-input" id="edit-seasons" placeholder="Tournois joués" type="number" min="0">
+      <input class="form-input" id="edit-name"    placeholder="Pseudo" maxlength="20">
+      <input class="form-input" id="edit-deck"    placeholder="Deck favori">
+      <input class="form-input" id="edit-wins"    placeholder="Victoires"       type="number" min="0">
+      <input class="form-input" id="edit-losses"  placeholder="Défaites"        type="number" min="0">
+      <input class="form-input" id="edit-seasons" placeholder="Tournois joués"  type="number" min="0">
+      <!--
+        Pour ajouter un champ :
+        1. <input class="form-input" id="edit-monchamp" placeholder="Mon champ">
+        2. L'ajouter dans js/profile.js → saveProfile() et renderProfile()
+      -->
       <button class="btn-primary" onclick="saveProfile()">💾 Sauvegarder</button>
       <div style="height:8px;"></div>
       <button class="btn-ghost" style="width:100%; text-align:center;" onclick="toggleEdit()">Annuler</button>
@@ -511,8 +209,9 @@ body::before {
   </div>
 </div>
 
+
 <!-- ══════════════════════════════
-     DECKS (liste)
+     PAGE : DECKS (liste)
 ══════════════════════════════ -->
 <div class="page" id="page-decks">
   <div class="header">
@@ -522,15 +221,23 @@ body::before {
     </div>
   </div>
   <div class="content">
+    <!-- Modifie les decks dans js/decks.js -->
     <div class="stitle">Saison 1</div>
     <div id="deck-list-s1"></div>
     <div class="stitle" style="margin-top:6px;">Saison 2</div>
     <div id="deck-list-s2"></div>
+    <!--
+      Pour une saison 3 :
+      <div class="stitle" style="margin-top:6px;">Saison 3</div>
+      <div id="deck-list-s3"></div>
+      Puis ajouter initDecks() dans js/decks.js
+    -->
   </div>
 </div>
 
+
 <!-- ══════════════════════════════
-     DECK VIEWER
+     PAGE : DECK VIEWER
 ══════════════════════════════ -->
 <div class="page" id="page-deck-view">
   <div class="header" style="gap:10px;">
@@ -542,16 +249,17 @@ body::before {
   </div>
   <div class="content">
     <div class="stitle">Main Deck</div>
-    <div id="dv-main" style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:16px;"></div>
+    <div id="dv-main"  style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:16px;"></div>
     <div class="stitle">Extra Deck</div>
     <div id="dv-extra" style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:16px;"></div>
     <div class="stitle">Side Deck</div>
-    <div id="dv-side" style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;"></div>
+    <div id="dv-side"  style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;"></div>
   </div>
 </div>
 
+
 <!-- ══════════════════════════════
-     PUZZLES
+     PAGE : PUZZLES
 ══════════════════════════════ -->
 <div class="page" id="page-puzzles">
   <div class="header">
@@ -561,6 +269,7 @@ body::before {
     </div>
   </div>
   <div class="content">
+    <!-- Remplacer par le contenu des puzzles quand prêt -->
     <div class="empty-state">
       <div class="empty-icon">🧩</div>
       <div class="empty-title">Aucun puzzle disponible</div>
@@ -569,8 +278,9 @@ body::before {
   </div>
 </div>
 
+
 <!-- ══════════════════════════════
-     PARAMÈTRES
+     PAGE : PARAMÈTRES
 ══════════════════════════════ -->
 <div class="page" id="page-settings">
   <div class="header">
@@ -622,256 +332,25 @@ body::before {
   </div>
 </div>
 
+
 <!-- ══════════════════════════════
      BOTTOM NAV
+     Pour ajouter un onglet :
+     1. Ajouter un nav-item ici
+     2. Créer le div.page correspondant ci-dessus
+     3. Créer un module JS si besoin dans js/
 ══════════════════════════════ -->
 <nav class="bottom-nav">
-  <div class="nav-item active" onclick="nav('home',this)"><span class="ni">🏠</span><span class="nl">Accueil</span></div>
-  <div class="nav-item" onclick="nav('updates',this)"><span class="ni">📢</span><span class="nl">Updates</span></div>
-  <div class="nav-item" onclick="nav('profile',this)"><span class="ni">👤</span><span class="nl">Profil</span></div>
-  <div class="nav-item" onclick="nav('decks',this)"><span class="ni">🃏</span><span class="nl">Decks</span></div>
-  <div class="nav-item" onclick="nav('puzzles',this)"><span class="ni">🧩</span><span class="nl">Puzzles</span></div>
-  <div class="nav-item" onclick="nav('settings',this)"><span class="ni">⚙️</span><span class="nl">Params</span></div>
+  <div class="nav-item active"  onclick="nav('home',     this)"><span class="ni">🏠</span><span class="nl">Accueil</span></div>
+  <div class="nav-item"         onclick="nav('updates',  this)"><span class="ni">📢</span><span class="nl">Updates</span></div>
+  <div class="nav-item"         onclick="nav('profile',  this)"><span class="ni">👤</span><span class="nl">Profil</span></div>
+  <div class="nav-item"         onclick="nav('decks',    this)"><span class="ni">🃏</span><span class="nl">Decks</span></div>
+  <div class="nav-item"         onclick="nav('puzzles',  this)"><span class="ni">🧩</span><span class="nl">Puzzles</span></div>
+  <div class="nav-item"         onclick="nav('settings', this)"><span class="ni">⚙️</span><span class="nl">Params</span></div>
 </nav>
 
-<script>
-// ── Navigation ──
-let lastNavEl = null;
-function nav(page, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  el.classList.add('active');
-  lastNavEl = el;
-}
+<!-- JS modulaire (type=module pour les imports ES6) -->
+<script type="module" src="js/app.js"></script>
 
-// ═══════════════════════════════════
-// DECKS — Viewer .ydk
-// ═══════════════════════════════════
-
-const PICS_BASE = 'https://raw.githubusercontent.com/Mazorn/VAACT-Very-Accurate-Anime-Character-Tournament-/main/pics/';
-const YDK_BASE  = 'https://raw.githubusercontent.com/Mazorn/VAACT-Very-Accurate-Anime-Character-Tournament-Deck/main/';
-
-// Liste des decks VAACT S1 & S2 (noms de fichiers exacts sur GitHub)
-const DECKS_S1 = [
-  { name: 'Atem',                   file: '[VAAACT S1] 1 Atem.ydk',                    emoji: '👑', sub: '' },
-  { name: 'Atem (Débutant)',         file: '[VAAACT S1] 1.5 Atem Débutant.ydk',         emoji: '👑', sub: 'Débutant' },
-  { name: 'Seto Kaiba',             file: '[VAAACT S1] 2 Seto Kaiba.ydk',              emoji: '🐉', sub: '' },
-  { name: 'Joey Wheeler',           file: '[VAAACT S1] 3 Joey Wheeler.ydk',            emoji: '🎲', sub: '' },
-  { name: 'Joey Wheeler (Débutant)',file: '[VAAACT S1] 3.5 Joey Wheeler Débutant.ydk', emoji: '🎲', sub: 'Débutant' },
-  { name: 'Jaden Yuki',             file: '[VAAACT S1] 4 Jaden Yukis.ydk',             emoji: '🔥', sub: '' },
-  { name: 'Jaden Yuki (Débutant)',  file: '[VAAACT S1] 4.5 Jaden Yuki Débutant.ydk',  emoji: '🔥', sub: 'Débutant' },
-  { name: 'Chad Princeton',         file: '[VAAACT S1] 5 Chad Princeton.ydk',          emoji: '🖤', sub: '' },
-  { name: 'Chad Princeton (Déb.)',  file: '[VAAACT S1] 5.5 Chad Princeton Débutant.ydk',emoji: '🖤', sub: 'Débutant' },
-  { name: 'Zane Truesdale',         file: '[VAAACT S1] 6 Zane Truesdale.ydk',          emoji: '⚡', sub: '' },
-  { name: 'Aster Phoenix',          file: '[VAAACT S1] 7 Aster Phoenix.ydk',           emoji: '🌟', sub: '' },
-  { name: 'Aster Phoenix (Déb.)',   file: '[VAAACT S1] 7.5 Aster Phoenix Débutant.ydk',emoji: '🌟', sub: 'Débutant' },
-  { name: 'Yusei Fudo',             file: '[VAAACT S1] 8 Yusei Fudo.ydk',              emoji: '🏍️', sub: '' },
-  { name: 'Yusei Fudo (Débutant)',  file: '[VAAACT S1] 8.5 Yusei Fudo Débutant.ydk',  emoji: '🏍️', sub: 'Débutant' },
-  { name: 'Jack Atlas',             file: '[VAAACT S1] 9 Jack Atlas.ydk',              emoji: '♠️', sub: '' },
-  { name: 'Yuma Tsukumo',           file: '[VAAACT S1] 10 Yuma Tsukumo.ydk',           emoji: '🔢', sub: '' },
-  { name: 'Yuma Tsukumo (Déb.)',    file: '[VAAACT S1] 10.5 Yuma Tsukumo Débutant.ydk',emoji: '🔢', sub: 'Débutant' },
-  { name: 'Kite Tenjo',             file: '[VAAACT S1] 11 Kite Tenjo.ydk',             emoji: '🌌', sub: '' },
-  { name: 'Shark',                  file: '[VAAACT S1] 12 Shark.ydk',                  emoji: '🦈', sub: '' },
-  { name: 'Yuya Sakaki',            file: '[VAAACT S1] 13 Yuya Sakaki.ydk',            emoji: '🎪', sub: '' },
-  { name: 'Reiji Akaba',            file: '[VAAACT S1] 14 Reiji Akaba.ydk',            emoji: '🃏', sub: '' },
-  { name: 'Playmaker',              file: '[VAAACT S1] 15 Playmaker.ydk',              emoji: '💻', sub: '' },
-  { name: 'Revolver',               file: '[VAAACT S1] 16 Revolver.ydk',               emoji: '🔫', sub: '' },
-];
-const DECKS_S2 = [];
-
-function renderDeckList(decks, containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
-  if (!decks.length) {
-    container.innerHTML = '<div class="dv-empty">Aucun deck pour cette saison.</div>';
-    return;
-  }
-  decks.forEach(deck => {
-    const row = document.createElement('div');
-    row.className = 'deck-row';
-    row.style.cursor = 'pointer';
-    const badge = deck.sub ? `<span class="badge b-grey" style="font-size:8px;">${deck.sub}</span>` : '';
-    row.innerHTML = `
-      <div class="deck-ico r" style="font-size:22px;">${deck.emoji}</div>
-      <div style="flex:1;">
-        <div class="deck-name">${deck.name}</div>
-        <div class="deck-meta" style="gap:6px;">Deck VAACT officiel ${badge}</div>
-      </div>
-      <div class="deck-arrow">›</div>`;
-    row.onclick = () => openDeck(deck);
-    container.appendChild(row);
-  });
-}
-
-async function openDeck(deck) {
-  // Afficher la page viewer
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-deck-view').classList.add('active');
-  document.getElementById('dv-title').textContent = deck.name;
-  document.getElementById('dv-count').textContent = 'Chargement...';
-  document.getElementById('dv-main').innerHTML  = '<div class="dv-empty">Chargement...</div>';
-  document.getElementById('dv-extra').innerHTML = '';
-  document.getElementById('dv-side').innerHTML  = '';
-
-  try {
-    const url = YDK_BASE + encodeURIComponent(deck.file);
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error('Fichier introuvable');
-    const text = await resp.text();
-    parseAndRenderYdk(text, deck.name);
-  } catch(e) {
-    document.getElementById('dv-main').innerHTML = `<div class="dv-empty" style="color:#ff6060;">❌ Impossible de charger le deck.<br>Vérifie ta connexion.</div>`;
-    document.getElementById('dv-count').textContent = 'Erreur';
-  }
-}
-
-function parseAndRenderYdk(text, name) {
-  const lines = text.split(/\r?\n/).map(l => l.trim());
-  let section = 'main';
-  const main = [], extra = [], side = [];
-
-  for (const line of lines) {
-    if (line === '#main')  { section = 'main';  continue; }
-    if (line === '#extra') { section = 'extra'; continue; }
-    if (line === '!side')  { section = 'side';  continue; }
-    if (!line || line.startsWith('#') || line.startsWith('!')) continue;
-    const id = parseInt(line);
-    if (!isNaN(id)) {
-      if (section === 'main')  main.push(id);
-      else if (section === 'extra') extra.push(id);
-      else if (section === 'side')  side.push(id);
-    }
-  }
-
-  const total = main.length + extra.length + side.length;
-  document.getElementById('dv-count').textContent = `${main.length} main · ${extra.length} extra · ${side.length} side`;
-
-  renderCardGrid('dv-main',  groupCards(main));
-  renderCardGrid('dv-extra', groupCards(extra));
-  renderCardGrid('dv-side',  groupCards(side));
-}
-
-function groupCards(ids) {
-  const map = {};
-  ids.forEach(id => { map[id] = (map[id] || 0) + 1; });
-  return Object.entries(map).map(([id, qty]) => ({ id: parseInt(id), qty }));
-}
-
-function renderCardGrid(containerId, cards) {
-  const el = document.getElementById(containerId);
-  if (!cards.length) { el.innerHTML = '<div class="dv-empty">—</div>'; return; }
-  el.innerHTML = '';
-  cards.forEach(({ id, qty }) => {
-    const thumb = document.createElement('div');
-    thumb.className = 'card-thumb';
-    thumb.title = `ID: ${id}`;
-    const img = document.createElement('img');
-    img.src = PICS_BASE + id + '.jpg';
-    img.alt = id;
-    img.onerror = function() {
-      this.parentNode.innerHTML = `<div class="card-fallback">${id}</div>`;
-      if (qty > 1) this.parentNode.innerHTML += `<div class="card-qty">x${qty}</div>`;
-    };
-    thumb.appendChild(img);
-    if (qty > 1) {
-      const qtyEl = document.createElement('div');
-      qtyEl.className = 'card-qty';
-      qtyEl.textContent = 'x' + qty;
-      thumb.appendChild(qtyEl);
-    }
-    el.appendChild(thumb);
-  });
-}
-
-function backToDecks() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-decks').classList.add('active');
-}
-
-// Init listes de decks
-renderDeckList(DECKS_S1, 'deck-list-s1');
-renderDeckList(DECKS_S2, 'deck-list-s2');
-
-// ── Base de données profil (localStorage) ──
-const DB_KEY = 'vaact_profile';
-
-function getProfile() {
-  const raw = localStorage.getItem(DB_KEY);
-  return raw ? JSON.parse(raw) : {
-    name: 'Duelliste', deck: 'Non défini',
-    wins: 0, losses: 0, seasons: 0
-  };
-}
-
-function saveProfile() {
-  const p = {
-    name:    document.getElementById('edit-name').value.trim()    || 'Duelliste',
-    deck:    document.getElementById('edit-deck').value.trim()    || 'Non défini',
-    wins:    parseInt(document.getElementById('edit-wins').value)    || 0,
-    losses:  parseInt(document.getElementById('edit-losses').value)  || 0,
-    seasons: parseInt(document.getElementById('edit-seasons').value) || 0,
-  };
-  localStorage.setItem(DB_KEY, JSON.stringify(p));
-  renderProfile(p);
-  toggleEdit();
-}
-
-function renderProfile(p) {
-  document.getElementById('display-name').textContent  = p.name;
-  document.getElementById('display-deck').textContent  = p.deck;
-  document.getElementById('stat-wins').textContent     = p.wins;
-  document.getElementById('stat-losses').textContent   = p.losses;
-  document.getElementById('stat-seasons').textContent  = p.seasons;
-  const total = p.wins + p.losses;
-  document.getElementById('stat-winrate').textContent  = total > 0 ? Math.round(p.wins / total * 100) + '%' : '—';
-  // Rang dynamique
-  const wr = total > 0 ? p.wins / total : 0;
-  let rang = 'Apprenti Duelliste';
-  if (p.wins >= 20 && wr >= 0.7) rang = 'Maître Dueliste';
-  else if (p.wins >= 10 && wr >= 0.6) rang = 'Duelliste Expert';
-  else if (p.wins >= 5) rang = 'Duelliste Confirmé';
-  document.getElementById('display-title').textContent = rang;
-  document.getElementById('display-badge').textContent = `${p.wins}V - ${p.losses}D`;
-}
-
-function toggleEdit() {
-  const view = document.getElementById('profile-view');
-  const edit = document.getElementById('profile-edit');
-  const p = getProfile();
-  if (edit.style.display === 'none') {
-    document.getElementById('edit-name').value    = p.name;
-    document.getElementById('edit-deck').value    = p.deck;
-    document.getElementById('edit-wins').value    = p.wins;
-    document.getElementById('edit-losses').value  = p.losses;
-    document.getElementById('edit-seasons').value = p.seasons;
-    view.style.display = 'none';
-    edit.style.display = 'block';
-  } else {
-    view.style.display = 'block';
-    edit.style.display = 'none';
-  }
-}
-
-function resetProfile() {
-  if (confirm('Réinitialiser le profil ?')) {
-    localStorage.removeItem(DB_KEY);
-    renderProfile(getProfile());
-  }
-}
-
-// ── Init ──
-renderProfile(getProfile());
-
-// ── Service Worker ──
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('[VAACT] SW ✅'))
-      .catch(e => console.log('[VAACT] SW ❌', e));
-  });
-}
-</script>
 </body>
 </html>
